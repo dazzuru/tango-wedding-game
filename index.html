@@ -326,7 +326,7 @@ body {
       langToggle: "EN",
       title: "婚禮動腦小遊戲 💍",
       subtitle: `
-      <strong>睇下你可唔可以完成晒 5 關！</strong>
+      <strong>睇下你可唔可以完成晒 5 關！</strong><br>
       撳格仔填滿棋盤。<br>
       <em>（撳一次 = Terren，撳兩次 = Candy，撳三次 = 清除）</em><br><br>
       每一行同每一列都要有 <strong>3 個 Candy</strong> 同 <strong>3 個 Terren</strong>。
@@ -510,40 +510,35 @@ body {
   const rulesNote = document.getElementById("rulesNote");
 
   function applyLanguage() {
-    const t = TEXT[currentLang];
+  const t = TEXT[currentLang];
 
-    langToggleBtn.textContent = t.langToggle;
-    titleText.textContent = t.title;
-    subtitleText.innerHTML = t.subtitle;
+  langToggleBtn.textContent = t.langToggle;
+  titleText.textContent = t.title;
+  subtitleText.innerHTML = t.subtitle;
 
-    rulesNote.innerHTML = `
-      <strong>${t.rulesTitle}</strong>
-      <ul>
-rulesNote.innerHTML = `
-  <strong>${t.rulesTitle}</strong>
-  <ul>
-    <li>${t.noTripleRule}</li>
-    <li><strong>=</strong> ${t.equalRule.replace("= ", "")}</li>
-    <li><strong>×</strong> ${t.crossRule.replace("× ", "")}</li>
-  </ul>
-`;
-      </ul>
-    `;
+  rulesNote.innerHTML = `
+    <strong>${t.rulesTitle}</strong>
+    <ul>
+      <li>${t.noTripleRule}</li>
+      <li><strong>=</strong> ${t.equalRule.replace("= ", "")}</li>
+      <li><strong>×</strong> ${t.crossRule.replace("× ", "")}</li>
+    </ul>
+  `;
 
-    undoBtn.textContent = t.undo;
-    resetBtn.textContent = t.reset;
-    nextLevelBtn.textContent = t.nextLevel;
+  undoBtn.textContent = t.undo;
+  resetBtn.textContent = t.reset;
+  nextLevelBtn.textContent = t.nextLevel;
 
-    updateLevelLabel();
+  updateLevelLabel();
 
-    if (messageEl.textContent) {
-      messageEl.textContent = t.error;
-    }
-
-    if (solvedOverlay.classList.contains("show")) {
-      updateSolvedPopupText();
-    }
+  if (messageEl.textContent) {
+    messageEl.textContent = t.error;
   }
+
+  if (solvedOverlay.classList.contains("show")) {
+    updateSolvedPopupText();
+  }
+}
 
   function updateLevelLabel() {
     const t = TEXT[currentLang];
