@@ -97,6 +97,98 @@ body {
   margin-bottom: 2px;
 }
 
+.level-timer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px auto 10px;
+  max-width: min(356px, 94vw);
+}
+
+.timer-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2e3f5c;
+  background: #eef5ff;
+  border: 1px solid #c9dcf5;
+  border-radius: 999px;
+  padding: 5px 10px;
+  min-width: 68px;
+}
+
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  padding: 14px;
+}
+
+.start-overlay.hide {
+  display: none;
+}
+
+.start-card {
+  width: min(280px, 86vw);
+  background: white;
+  border: 2px solid #c9dcf5;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(46, 63, 92, 0.18);
+  color: #2e3f5c;
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.start-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.start-subtitle {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.35;
+  margin-bottom: 14px;
+}
+
+.start-visuals {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.start-visual-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #eef5ff;
+  border: 1px solid #c9dcf5;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.start-mini-symbol {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.start-result-icon {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.start-btn {
+  background: #2e3f5c;
+  min-width: 130px;
+}
+
 .mobile-top-spacer {
   height: 0;
   width: 100%;
@@ -296,6 +388,11 @@ body {
   const size = 6;
 
   let currentLang = "en";
+  let timerInterval = null;
+  let startTime = null;
+  let elapsedMs = 0;
+  let gameStarted = false;
+  let gameFinished = false;
 
   const TEXT = {
     en: {
@@ -320,7 +417,11 @@ body {
       nextLevel: "Next Level",
       undo: "Undo",
       reset: "Reset",
-      error: "Something doesn’t follow the rules yet."
+      error: "Something doesn’t follow the rules yet.",
+      startTitle: "Ready to play?",
+      startSubtitle: "Fill the board. Two matching faces in a row is okay — three is not!",
+      startButton: "START",
+      finalTime: "Final time"
     },
     zh: {
       langToggle: "EN",
@@ -344,7 +445,11 @@ body {
       nextLevel: "下一關",
       undo: "上一步",
       reset: "重設",
-      error: "有啲地方唔符合規則呀"
+      error: "有啲地方唔符合規則呀",
+      startTitle: "準備好未？",
+      startSubtitle: "填滿棋盤。兩個一樣連住可以，三個一樣連住就唔得！",
+      startButton: "開始",
+      finalTime: "完成時間"
     }
   };
 
@@ -467,12 +572,38 @@ body {
     </div>
 
     <div class="tango-title" id="titleText"></div>
-      <div class="tango-subtitle" id="subtitleText"></div>
-        <div class="rules-note" id="rulesNote"></div>
-          <div class="level-label" id="levelLabel"></div>
-            <div class="game-area">
+    <div class="tango-subtitle" id="subtitleText"></div>
+    <div class="rules-note" id="rulesNote"></div>
+    <div class="level-timer-row">
+  <div class="level-label" id="levelLabel"></div>
+    <div class="timer-label" id="timerLabel">00:00</div>
+      </div>
+    <div class="game-area">
             
       <div class="grid-wrap" id="grid"></div>
+
+      <div class="start-overlay" id="startOverlay">
+        <div class="start-card">
+          <div class="start-title" id="startTitle"></div>
+          <div class="start-subtitle" id="startSubtitle"></div>
+
+          <div class="start-visuals" aria-hidden="true">
+            <div class="start-visual-row">
+              <img class="start-mini-symbol" src="https://i.imgur.com/XESa857.png" alt="">
+              <img class="start-mini-symbol" src="https://i.imgur.com/XESa857.png" alt="">
+              <span class="start-result-icon">✅</span>
+            </div>
+            <div class="start-visual-row">
+              <img class="start-mini-symbol" src="https://i.imgur.com/XESa857.png" alt="">
+              <img class="start-mini-symbol" src="https://i.imgur.com/XESa857.png" alt="">
+              <img class="start-mini-symbol" src="https://i.imgur.com/XESa857.png" alt="">
+              <span class="start-result-icon">❌</span>
+            </div>
+          </div>
+
+          <button class="start-btn" id="startBtn"></button>
+        </div>
+      </div>
 
       <div class="solved-overlay" id="solvedOverlay">
         <div class="solved-card">
@@ -492,6 +623,7 @@ body {
 </div>
 
 <div class="mobile-safe-spacer"></div>
+
   `;
 
   const gridEl = document.getElementById("grid");
@@ -508,6 +640,45 @@ body {
   const titleText = document.getElementById("titleText");
   const subtitleText = document.getElementById("subtitleText");
   const rulesNote = document.getElementById("rulesNote");
+  const timerLabel = document.getElementById("timerLabel");
+  const startOverlay = document.getElementById("startOverlay");
+  const startBtn = document.getElementById("startBtn");
+  const startTitle = document.getElementById("startTitle");
+  const startSubtitle = document.getElementById("startSubtitle");
+
+
+  function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+
+  function updateTimerDisplay() {
+    timerLabel.textContent = formatTime(elapsedMs);
+  }
+
+  function startTimer() {
+    if (gameStarted) return;
+    gameStarted = true;
+    startTime = Date.now();
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      elapsedMs = Date.now() - startTime;
+      updateTimerDisplay();
+    }, 250);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    if (startTime) {
+      elapsedMs = Date.now() - startTime;
+      updateTimerDisplay();
+    }
+  }
 
   function applyLanguage() {
   const t = TEXT[currentLang];
@@ -528,6 +699,9 @@ body {
   undoBtn.textContent = t.undo;
   resetBtn.textContent = t.reset;
   nextLevelBtn.textContent = t.nextLevel;
+  startTitle.textContent = t.startTitle;
+  startSubtitle.textContent = t.startSubtitle;
+  startBtn.textContent = t.startButton;
 
   updateLevelLabel();
 
@@ -557,13 +731,16 @@ body {
     if (isLastLevel) {
       solvedImage.src = "https://i.imgur.com/EGSGSyp.gif";
       solvedTitle.textContent = t.finalTitle;
-      solvedText.textContent = t.finalText;
+      solvedText.innerHTML = `${t.finalText}<br><strong>${t.finalTime}: ${formatTime(elapsedMs)}</strong>`;
       nextLevelBtn.style.display = "none";
     } else {
       solvedImage.src = "https://i.imgur.com/wePo60P.gif";
       solvedTitle.textContent = t.solvedTitle;
       solvedText.textContent = t.solvedText;
       nextLevelBtn.textContent = t.nextLevel;
+  startTitle.textContent = t.startTitle;
+  startSubtitle.textContent = t.startSubtitle;
+  startBtn.textContent = t.startButton;
       nextLevelBtn.style.display = "inline-block";
     }
   }
@@ -613,7 +790,7 @@ body {
         }
 
         cell.onclick = () => {
-          if (locked[r][c] || solvedOverlay.classList.contains("show")) return;
+          if (!gameStarted || gameFinished || locked[r][c] || solvedOverlay.classList.contains("show")) return;
 
           saveHistory();
 
@@ -736,6 +913,12 @@ body {
     const complete = grid.every(row => row.every(cell => cell !== EMPTY));
 
     if (complete && !hasError) {
+      const isLastLevel = currentLevelIndex === levels.length - 1;
+      if (isLastLevel && !gameFinished) {
+        gameFinished = true;
+        stopTimer();
+      }
+
       solvedOverlay.classList.add("show");
       messageEl.textContent = "";
 
@@ -777,9 +960,15 @@ body {
     }
   };
 
+  startBtn.onclick = () => {
+    startOverlay.classList.add("hide");
+    startTimer();
+  };
+
   window.addEventListener("resize", render);
 
   applyLanguage();
+  updateTimerDisplay();
   loadLevel(currentLevelIndex);
 })();
 
