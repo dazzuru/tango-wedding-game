@@ -63,11 +63,14 @@ body {
   margin-bottom: 10px;
   color: #555;
   font-weight: 500;
-}.level-label {
-  font-size: 14px;
+  line-height: 1.4;
+}
+  
+  .level-label {
+  font-size: 16px;
   color: #2e3f5c;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin: 12px 0 10px;
 }
 
 .rules-note {
@@ -298,7 +301,12 @@ body {
     en: {
       langToggle: "中文",
       title: "Terren & Candy's Wedding Puzzle Challenge 💍",
-      subtitle: "Finish all 5 levels! Fill the board by tapping the squares. Each row and column must have 3 Candy & 3 Terren.<br><br>Tap once for Terren, twice for Candy, and three times to clear the square.",
+      subtitle: `
+      <strong>Finish all 5 levels!</strong><br>
+      Tap squares to fill the board.<br>
+      <em>(Tap once = Terren, twice = Candy, three times = clear)</em><br><br>
+      Each row and column must have <strong>3 Candy</strong> and <strong>3 Terren</strong>.
+      `,
       level: "Level",
       of: "of",
       rulesTitle: "Quick rules:",
@@ -317,13 +325,18 @@ body {
     zh: {
       langToggle: "EN",
       title: "婚禮動腦小遊戲 💍",
-      subtitle: "完成晒 5 關！撳格仔填滿棋盤。每一行同每一列都要有 3 個 Candy 同 3 個 Terren。",
+      subtitle: `
+      <strong>睇下你可唔可以完成晒 5 關！</strong>
+      撳格仔填滿棋盤。<br>
+      <em>（撳一次 = Terren，撳兩次 = Candy，撳三次 = 清除）</em><br><br>
+      每一行同每一列都要有 <strong>3 個 Candy</strong> 同 <strong>3 個 Terren</strong>。
+      `,
       level: "第",
       of: "關，共",
       rulesTitle: "玩法：",
+      noTripleRule: "同一行或者同一列，唔可以有 3 個相同圖案連埋一齊",
       equalRule: "= 連住嘅兩格要一樣",
       crossRule: "× 連住嘅兩格要唔同",
-      noTripleRule: "同一行或同一列，唔可以有 3 個一樣嘅圖案連埋一齊",
       solvedTitle: "完成咗 🌟",
       solvedText: "好嘢，繼續下一關！",
       finalTitle: "全部完成！💖",
@@ -454,12 +467,11 @@ body {
     </div>
 
     <div class="tango-title" id="titleText"></div>
-    <div class="tango-subtitle" id="subtitleText"></div>
-    <div class="level-label" id="levelLabel"></div>
-
-    <div class="rules-note" id="rulesNote"></div>
-
-    <div class="game-area">
+      <div class="tango-subtitle" id="subtitleText"></div>
+        <div class="rules-note" id="rulesNote"></div>
+          <div class="level-label" id="levelLabel"></div>
+            <div class="game-area">
+            
       <div class="grid-wrap" id="grid"></div>
 
       <div class="solved-overlay" id="solvedOverlay">
@@ -502,14 +514,19 @@ body {
 
     langToggleBtn.textContent = t.langToggle;
     titleText.textContent = t.title;
-    subtitleText.textContent = t.subtitle;
+    subtitleText.innerHTML = t.subtitle;
 
     rulesNote.innerHTML = `
       <strong>${t.rulesTitle}</strong>
       <ul>
-        <li><strong>=</strong> ${t.equalRule.replace("= ", "")}</li>
-        <li><strong>×</strong> ${t.crossRule.replace("× ", "")}</li>
-        <li>${t.noTripleRule}</li>
+rulesNote.innerHTML = `
+  <strong>${t.rulesTitle}</strong>
+  <ul>
+    <li>${t.noTripleRule}</li>
+    <li><strong>=</strong> ${t.equalRule.replace("= ", "")}</li>
+    <li><strong>×</strong> ${t.crossRule.replace("× ", "")}</li>
+  </ul>
+`;
       </ul>
     `;
 
