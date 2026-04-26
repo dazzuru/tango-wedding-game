@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Terren & Candy's Wedding Puzzle Challenge</title>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap');
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  -webkit-text-size-adjust: 100%;
+  background: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+  #wedding-tango {
+    font-family: 'Quicksand', Arial, sans-serif;
+    padding: max(40px, env(safe-area-inset-top)) 8px max(160px, env(safe-area-inset-bottom));
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    text-align: center;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .language-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+#langToggleBtn {
+  background: #eef5ff;
+  color: #2e3f5c;
+  border: 1px solid #c9dcf5;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.tango-title {
+  font-size: clamp(22px, 6.5vw, 28px);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.tango-subtitle {
+  font-size: clamp(12px, 3.3vw, 14px);
+  margin-bottom: 10px;
+  color: #555;
+  font-weight: 500;
+}.level-label {
+  font-size: 14px;
+  color: #2e3f5c;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.rules-note {
+  background: #eef5ff;
+  border: 1px solid #c9dcf5;
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin: 0 auto 14px;
+  max-width: min(360px, 94vw);
+  color: #2e3f5c;
+  font-size: clamp(12px, 3.3vw, 14px);
+  line-height: 1.35;
+  text-align: left;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.rules-note ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.rules-note li {
+  margin-bottom: 2px;
+}
+
+.mobile-top-spacer {
+  height: 0;
+  width: 100%;
+  pointer-events: none;
+}
+  
+  .mobile-safe-spacer {
+  height: 0;
+  width: 100%;
+  pointer-events: none;
+}
+  
+  .game-area {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  .grid-wrap {
+    --board-size: min(94vw, 356px);
+    --cell-size: calc(var(--board-size) / 6);
+
+    display: grid;
+    grid-template-columns: repeat(6, var(--cell-size));
+    grid-template-rows: repeat(6, var(--cell-size));
+    position: relative;
+    width: var(--board-size);
+    height: var(--board-size);
+    margin: 0 auto;
+    border: 2px solid #566d94;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    box-sizing: border-box;
+  }
+
+  .cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-right: 2px solid #758fba;
+    border-bottom: 2px solid #758fba;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .cell:nth-child(6n) {
+    border-right: none;
+  }
+
+  .cell:nth-child(n+31) {
+    border-bottom: none;
+  }
+
+  .cell.locked {
+    background: #dadfeb;
+    cursor: not-allowed;
+  }
+
+  .cell.error {
+    background: #ffbfbf;
+  }
+
+  .symbol-img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .constraint {
+    position: absolute;
+    font-weight: 700;
+    font-size: clamp(13px, 4vw, 18px);
+    color: #2e3f5c;
+    background: white;
+    border-radius: 20%;
+    width: clamp(13px, 4vw, 15px);
+    height: clamp(13px, 4vw, 15px);
+    line-height: clamp(13px, 4vw, 15px);
+    text-align: center;
+    pointer-events: none;
+    box-sizing: border-box;
+    z-index: 2;
+  }
+
+  .solved-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 16px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .solved-overlay.show {
+    display: flex;
+  }
+
+  .solved-card {
+    background: white;
+    border: 2px solid #c9dcf5;
+    border-radius: 18px;
+    padding: 18px 20px;
+    box-shadow: 0 8px 24px rgba(46, 63, 92, 0.18);
+    color: #2e3f5c;
+    max-width: 240px;
+    text-align: center;
+  }
+
+  .solved-image {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin: 0 auto 10px;
+  }
+
+  @keyframes solvedBounce {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  .solved-image.bounce {
+    animation: solvedBounce 0.45s ease;
+  }
+
+  .solved-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .solved-text {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .next-level-btn {
+    background: #2e3f5c;
+  }
+
+  .message {
+  margin-top: 12px;
+  font-weight: 700;
+  min-height: 18px;
+}
+
+.button-row {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-direction: row-reverse;
+}
+
+  button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 999px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    font-family: 'Quicksand', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+
+  #resetBtn {
+    background: #d9d9d9;
+    color: #333;
+  }
+
+  </style>
+</head>
+<body>
+  <div id="wedding-tango"></div>
+
+  <script>
+(function () {
+  const SUN = "S";
+  const MOON = "M";
+  const EMPTY = "";
+  const size = 6;
+
+  let currentLang = "en";
+
+  const TEXT = {
+    en: {
+      langToggle: "中文",
+      title: "Terren & Candy's Wedding Puzzle Challenge 💍",
+      subtitle: "Finish all 5 levels! Fill the board by tapping the squares. Each row and column must have 3 Candy & 3 Terren.",
+      level: "Level",
+      of: "of",
+      rulesTitle: "Quick rules:",
+      equalRule: "= two connected squares must match",
+      crossRule: "× two connected squares must be different",
+      noTripleRule: "No more than two matching squares can sit beside each other in a row or column",
+      solvedTitle: "Solved 🌟",
+      solvedText: "LET'S GOOO! Keep it up!",
+      finalTitle: "ALL DONE! 💖",
+      finalText: "WOWIE good job!",
+      nextLevel: "Next Level",
+      undo: "Undo",
+      reset: "Reset",
+      error: "Something doesn’t follow the rules yet."
+    },
+    zh: {
+      langToggle: "EN",
+      title: "婚禮動腦小遊戲 💍",
+      subtitle: "完成晒 5 關！撳格仔填滿棋盤。每一行同每一列都要有 3 個 Candy 同 3 個 Terren。",
+      level: "第",
+      of: "關，共",
+      rulesTitle: "玩法：",
+      equalRule: "= 連住嘅兩格要一樣",
+      crossRule: "× 連住嘅兩格要唔同",
+      noTripleRule: "同一行或同一列，唔可以有 3 個一樣嘅圖案連埋一齊",
+      solvedTitle: "完成咗 🌟",
+      solvedText: "好嘢，繼續下一關！",
+      finalTitle: "全部完成！💖",
+      finalText: "嘩，好叻呀！",
+      nextLevel: "下一關",
+      undo: "上一步",
+      reset: "重設",
+      error: "有啲地方唔符合規則呀"
+    }
+  };
+
+  const SYMBOLS = {
+    S: { image: "https://i.imgur.com/XESa857.png" },
+    M: { image: "https://i.imgur.com/pG5NMRd.png" }
+  };
+
+  const levels = [
+    {
+      name: "Level 1",
+      startingGrid: [
+        ["", "", "M", "", "", ""],
+        ["", "", "", "M", "", ""],
+        ["S", "", "", "", "", "M"],
+        ["M", "", "", "", "", "S"],
+        ["", "", "S", "", "", ""],
+        ["", "", "", "S", "", ""]
+      ],
+      constraints: [
+        { r1: 0, c1: 1, r2: 0, c2: 2, type: "=" },
+        { r1: 0, c1: 3, r2: 0, c2: 4, type: "=" },
+        { r1: 2, c1: 1, r2: 2, c2: 0, type: "=" },
+        { r1: 3, c1: 4, r2: 3, c2: 5, type: "=" },
+        { r1: 4, c1: 2, r2: 4, c2: 1, type: "=" },
+        { r1: 4, c1: 3, r2: 4, c2: 4, type: "=" },
+        { r1: 1, c1: 1, r2: 1, c2: 2, type: "x" },
+        { r1: 1, c1: 3, r2: 1, c2: 4, type: "x" },
+        { r1: 5, c1: 1, r2: 5, c2: 2, type: "x" },
+        { r1: 5, c1: 3, r2: 5, c2: 4, type: "x" },
+      ]
+    },
+    {
+      name: "Level 2",
+      startingGrid: [
+        ["", "", "S", "M", "", ""],
+        ["", "S", "", "", "S", ""],
+        ["M", "", "", "", "", "M"],
+        ["S", "", "", "", "", "S"],
+        ["", "M", "", "", "M", ""],
+        ["", "", "S", "M", "", ""]
+      ],
+      constraints: [
+        { r1: 2, c1: 3, r2: 2, c2: 4, type: "=" },
+        { r1: 3, c1: 1, r2: 3, c2: 2, type: "x" },
+      ]
+    },
+    {
+      name: "Level 3",
+      startingGrid: [
+        ["", "S", "", "", "S", ""],
+        ["M", "S", "", "", "S", "S"],
+        ["", "", "", "", "", ""],
+        ["", "", "", "", "", ""],
+        ["S", "", "", "", "", "M"],
+        ["", "M", "M", "S", "M", ""]
+      ],
+      constraints: [
+        { r1: 2, c1: 2, r2: 2, c2: 3, type: "=" },
+        { r1: 3, c1: 2, r2: 3, c2: 3, type: "=" },
+        { r1: 2, c1: 2, r2: 3, c2: 2, type: "x" },
+        { r1: 2, c1: 3, r2: 3, c2: 3, type: "x" },
+      ]
+    },
+    {
+      name: "Level 4",
+      startingGrid: [
+        ["", "M", "", "S", "", ""],
+        ["", "", "", "", "", ""],
+        ["", "S", "", "M", "", ""],
+        ["", "", "S", "", "S", ""],
+        ["", "", "", "", "", ""],
+        ["", "", "S", "", "M", ""]
+      ],
+      constraints: [
+        { r1: 1, c1: 3, r2: 1, c2: 4, type: "=" },
+        { r1: 1, c1: 0, r2: 2, c2: 0, type: "=" },
+        { r1: 4, c1: 3, r2: 4, c2: 4, type: "=" },
+        { r1: 4, c1: 5, r2: 3, c2: 5, type: "=" },
+        { r1: 1, c1: 1, r2: 1, c2: 2, type: "x" },
+        { r1: 1, c1: 5, r2: 2, c2: 5, type: "x" },
+        { r1: 3, c1: 0, r2: 4, c2: 0, type: "x" },
+        { r1: 4, c1: 1, r2: 4, c2: 2, type: "x" },
+      ]
+    },
+    {
+      name: "Level 5",
+      startingGrid: [
+        ["", "", "", "", "", ""],
+        ["", "", "", "", "", ""],
+        ["S", "", "", "", "", "M"],
+        ["S", "", "", "", "", "S"],
+        ["", "M", "", "", "S", ""],
+        ["", "S", "", "", "S", ""]
+      ],
+      constraints: [
+        { r1: 0, c1: 0, r2: 1, c2: 0, type: "x" },
+        { r1: 0, c1: 1, r2: 1, c2: 1, type: "x" },
+        { r1: 0, c1: 4, r2: 1, c2: 4, type: "x" },
+        { r1: 0, c1: 5, r2: 1, c2: 5, type: "x" },
+        { r1: 1, c1: 2, r2: 1, c2: 3, type: "=" },
+      ]
+    }
+  ];
+
+  let currentLevelIndex = 0;
+  let startingGrid = [];
+  let constraints = [];
+  let grid = [];
+  let history = [];
+  let locked = [];
+
+  const container = document.getElementById("wedding-tango");
+
+  container.innerHTML = `
+    <div class="mobile-top-spacer"></div>
+
+    <div class="language-row">
+      <button id="langToggleBtn">中文</button>
+    </div>
+
+    <div class="tango-title" id="titleText"></div>
+    <div class="tango-subtitle" id="subtitleText"></div>
+    <div class="level-label" id="levelLabel"></div>
+
+    <div class="rules-note" id="rulesNote"></div>
+
+    <div class="game-area">
+      <div class="grid-wrap" id="grid"></div>
+
+      <div class="solved-overlay" id="solvedOverlay">
+        <div class="solved-card">
+          <img class="solved-image" id="solvedImage" alt="Solved celebration" />
+          <div class="solved-title" id="solvedTitle"></div>
+          <div class="solved-text" id="solvedText"></div>
+          <button class="next-level-btn" id="nextLevelBtn"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="button-row">
+  <button id="undoBtn" disabled></button>
+  <button id="resetBtn"></button>
+</div>
+
+<div class="mobile-safe-spacer"></div>
+  `;
+
+  const gridEl = document.getElementById("grid");
+  const messageEl = document.getElementById("message");
+  const undoBtn = document.getElementById("undoBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const solvedOverlay = document.getElementById("solvedOverlay");
+  const levelLabel = document.getElementById("levelLabel");
+  const nextLevelBtn = document.getElementById("nextLevelBtn");
+  const solvedTitle = document.getElementById("solvedTitle");
+  const solvedText = document.getElementById("solvedText");
+  const solvedImage = document.getElementById("solvedImage");
+  const langToggleBtn = document.getElementById("langToggleBtn");
+  const titleText = document.getElementById("titleText");
+  const subtitleText = document.getElementById("subtitleText");
+  const rulesNote = document.getElementById("rulesNote");
+
+  function applyLanguage() {
+    const t = TEXT[currentLang];
+
+    langToggleBtn.textContent = t.langToggle;
+    titleText.textContent = t.title;
+    subtitleText.textContent = t.subtitle;
+
+    rulesNote.innerHTML = `
+      <strong>${t.rulesTitle}</strong>
+      <ul>
+        <li><strong>=</strong> ${t.equalRule.replace("= ", "")}</li>
+        <li><strong>×</strong> ${t.crossRule.replace("× ", "")}</li>
+        <li>${t.noTripleRule}</li>
+      </ul>
+    `;
+
+    undoBtn.textContent = t.undo;
+    resetBtn.textContent = t.reset;
+    nextLevelBtn.textContent = t.nextLevel;
+
+    updateLevelLabel();
+
+    if (messageEl.textContent) {
+      messageEl.textContent = t.error;
+    }
+
+    if (solvedOverlay.classList.contains("show")) {
+      updateSolvedPopupText();
+    }
+  }
+
+  function updateLevelLabel() {
+    const t = TEXT[currentLang];
+
+    if (currentLang === "zh") {
+      levelLabel.textContent = `${t.level} ${currentLevelIndex + 1} ${t.of} ${levels.length} 關`;
+    } else {
+      levelLabel.textContent = `${t.level} ${currentLevelIndex + 1} ${t.of} ${levels.length}`;
+    }
+  }
+
+  function updateSolvedPopupText() {
+    const t = TEXT[currentLang];
+    const isLastLevel = currentLevelIndex === levels.length - 1;
+
+    if (isLastLevel) {
+      solvedImage.src = "https://i.imgur.com/EGSGSyp.gif";
+      solvedTitle.textContent = t.finalTitle;
+      solvedText.textContent = t.finalText;
+      nextLevelBtn.style.display = "none";
+    } else {
+      solvedImage.src = "https://i.imgur.com/wePo60P.gif";
+      solvedTitle.textContent = t.solvedTitle;
+      solvedText.textContent = t.solvedText;
+      nextLevelBtn.textContent = t.nextLevel;
+      nextLevelBtn.style.display = "inline-block";
+    }
+  }
+
+  langToggleBtn.onclick = () => {
+    currentLang = currentLang === "en" ? "zh" : "en";
+    applyLanguage();
+  };
+
+  function loadLevel(index) {
+    const level = levels[index];
+
+    startingGrid = level.startingGrid;
+    constraints = level.constraints;
+    grid = startingGrid.map(row => [...row]);
+    history = [];
+
+    locked = startingGrid.map(row =>
+      row.map(cell => cell === SUN || cell === MOON)
+    );
+
+    solvedOverlay.classList.remove("show");
+    messageEl.textContent = "";
+    updateLevelLabel();
+    render();
+  }
+
+  function saveHistory() {
+    history.push(grid.map(row => [...row]));
+  }
+
+  function render() {
+    gridEl.innerHTML = "";
+
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        if (locked[r][c]) cell.classList.add("locked");
+
+        if (grid[r][c]) {
+          const img = document.createElement("img");
+          img.className = "symbol-img";
+          img.src = SYMBOLS[grid[r][c]].image;
+          cell.appendChild(img);
+        }
+
+        cell.onclick = () => {
+          if (locked[r][c] || solvedOverlay.classList.contains("show")) return;
+
+          saveHistory();
+
+          if (grid[r][c] === EMPTY) grid[r][c] = SUN;
+          else if (grid[r][c] === SUN) grid[r][c] = MOON;
+          else grid[r][c] = EMPTY;
+
+          render();
+        };
+
+        gridEl.appendChild(cell);
+      }
+    }
+
+    renderConstraints();
+    validate();
+    undoBtn.disabled = history.length === 0;
+  }
+
+  function renderConstraints() {
+    const cellSize = gridEl.clientWidth / size;
+
+    constraints.forEach(con => {
+      const el = document.createElement("div");
+      el.className = "constraint";
+      el.textContent = con.type === "x" ? "×" : "=";
+
+      const x1 = con.c1 * cellSize + cellSize / 2;
+      const y1 = con.r1 * cellSize + cellSize / 2;
+      const x2 = con.c2 * cellSize + cellSize / 2;
+      const y2 = con.r2 * cellSize + cellSize / 2;
+
+      el.style.left = ((x1 + x2) / 2) + "px";
+      el.style.top = ((y1 + y2) / 2) + "px";
+      el.style.transform = "translate(-50%, -50%)";
+
+      gridEl.appendChild(el);
+    });
+  }
+
+  function validate() {
+    const cells = gridEl.querySelectorAll(".cell");
+    cells.forEach(cell => cell.classList.remove("error"));
+
+    let hasError = false;
+
+    function markError(r, c) {
+      cells[r * size + c].classList.add("error");
+      hasError = true;
+    }
+
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size - 2; c++) {
+        if (
+          grid[r][c] &&
+          grid[r][c] === grid[r][c + 1] &&
+          grid[r][c] === grid[r][c + 2]
+        ) {
+          markError(r, c);
+          markError(r, c + 1);
+          markError(r, c + 2);
+        }
+      }
+    }
+
+    for (let c = 0; c < size; c++) {
+      for (let r = 0; r < size - 2; r++) {
+        if (
+          grid[r][c] &&
+          grid[r][c] === grid[r + 1][c] &&
+          grid[r][c] === grid[r + 2][c]
+        ) {
+          markError(r, c);
+          markError(r + 1, c);
+          markError(r + 2, c);
+        }
+      }
+    }
+
+    for (let r = 0; r < size; r++) {
+      const suns = grid[r].filter(v => v === SUN).length;
+      const moons = grid[r].filter(v => v === MOON).length;
+
+      if (suns > 3 || moons > 3) {
+        for (let c = 0; c < size; c++) markError(r, c);
+      }
+    }
+
+    for (let c = 0; c < size; c++) {
+      let suns = 0;
+      let moons = 0;
+
+      for (let r = 0; r < size; r++) {
+        if (grid[r][c] === SUN) suns++;
+        if (grid[r][c] === MOON) moons++;
+      }
+
+      if (suns > 3 || moons > 3) {
+        for (let r = 0; r < size; r++) markError(r, c);
+      }
+    }
+
+    constraints.forEach(con => {
+      const a = grid[con.r1][con.c1];
+      const b = grid[con.r2][con.c2];
+
+      if (!a || !b) return;
+
+      if (con.type === "=" && a !== b) {
+        markError(con.r1, con.c1);
+        markError(con.r2, con.c2);
+      }
+
+      if (con.type === "x" && a === b) {
+        markError(con.r1, con.c1);
+        markError(con.r2, con.c2);
+      }
+    });
+
+    const complete = grid.every(row => row.every(cell => cell !== EMPTY));
+
+    if (complete && !hasError) {
+      solvedOverlay.classList.add("show");
+      messageEl.textContent = "";
+
+      solvedImage.classList.remove("bounce");
+      void solvedImage.offsetWidth;
+      solvedImage.classList.add("bounce");
+
+      updateSolvedPopupText();
+    } else {
+      solvedOverlay.classList.remove("show");
+
+      if (hasError) {
+        messageEl.textContent = TEXT[currentLang].error;
+        messageEl.style.color = "#d9534f";
+      } else {
+        messageEl.textContent = "";
+      }
+    }
+  }
+
+  undoBtn.onclick = () => {
+    if (history.length === 0) return;
+    grid = history.pop();
+    render();
+  };
+
+  resetBtn.onclick = () => {
+    grid = startingGrid.map(row => [...row]);
+    history = [];
+    solvedOverlay.classList.remove("show");
+    messageEl.textContent = "";
+    render();
+  };
+
+  nextLevelBtn.onclick = () => {
+    if (currentLevelIndex < levels.length - 1) {
+      currentLevelIndex++;
+      loadLevel(currentLevelIndex);
+    }
+  };
+
+  window.addEventListener("resize", render);
+
+  applyLanguage();
+  loadLevel(currentLevelIndex);
+})();
+
+  </script>
+</body>
+</html>
