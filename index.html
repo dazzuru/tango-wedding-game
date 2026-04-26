@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
-  <title>Terren & Candy's Wedding Puzzle Challenge!✨</title>
+  <title>Terren & Candy's<br>Wedding Puzzle Challenge!✨</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
   @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap');
@@ -401,7 +401,8 @@ body {
       subtitle: `
       <strong>Finish all 5 levels!</strong><br>
       Tap squares to fill the board.<br>
-      <em>(Tap once = Terren, twice = Candy, three times = clear)</em><br><br>
+      <em>Tap to cycle:<br>
+      Terren → Candy → Clear</em><br><br>
       Each row and column must have <strong>3 Candy</strong> and <strong>3 Terren</strong>.
       `,
       level: "Level",
@@ -409,7 +410,7 @@ body {
       rulesTitle: "Quick rules:",
       equalRule: "= two connected squares must match",
       crossRule: "× two connected squares must be different",
-      noTripleRule: "No more than two matching squares can sit beside each other in a row or column",
+      noTripleRule: "No more than two matching squares can be next to each other, vertically or horizontally.",
       solvedTitle: "Solved 🌟",
       solvedText: "LET'S GOOO! Keep it up!",
       finalTitle: "ALL DONE! 💖",
@@ -419,7 +420,7 @@ body {
       reset: "Reset",
       error: "Something doesn’t follow the rules yet.",
       startTitle: "Ready to play?",
-      startSubtitle: "Fill the board. Two matching faces in a row is okay — three is not!",
+      startSubtitle: "Fill the board. Two matching faces in a row or column is okay — three is not!",
       startButton: "START",
       finalTime: "Final time"
     },
@@ -429,13 +430,14 @@ body {
       subtitle: `
       <strong>睇下你可唔可以完成晒 5 關！</strong><br>
       撳格仔填滿棋盤。<br>
-      <em>（撳一次 = Terren，撳兩次 = Candy，撳三次 = 清除）</em><br><br>
+      <em>撳嚟切換：<br>
+      Terren → Candy → 清除</em><br><br>
       每一行同每一列都要有 <strong>3 個 Candy</strong> 同 <strong>3 個 Terren</strong>。
       `,
       level: "第",
       of: "關，共",
       rulesTitle: "玩法：",
-      noTripleRule: "同一行或者同一列，唔可以有 3 個相同圖案連埋一齊",
+      noTripleRule: "無論橫定直，相同圖案最多只可以連住兩個",
       equalRule: "= 連住嘅兩格要一樣",
       crossRule: "× 連住嘅兩格要唔同",
       solvedTitle: "完成咗 🌟",
@@ -447,7 +449,7 @@ body {
       reset: "重設",
       error: "有啲地方唔符合規則呀",
       startTitle: "準備好未？",
-      startSubtitle: "填滿棋盤。兩個一樣連住可以，三個一樣連住就唔得！",
+      startSubtitle: "填滿棋盤。橫或直兩個相同圖案係OK，三個就唔得！",
       startButton: "開始",
       finalTime: "完成時間"
     }
@@ -551,6 +553,7 @@ body {
         { r1: 0, c1: 4, r2: 1, c2: 4, type: "x" },
         { r1: 0, c1: 5, r2: 1, c2: 5, type: "x" },
         { r1: 1, c1: 2, r2: 1, c2: 3, type: "=" },
+        { r1: 1, c1: 1, r2: 2, c2: 1, type: "=" },
       ]
     }
   ];
